@@ -84,12 +84,13 @@ export default function Input() {
     setText("")
     setImageFileUrl(null);
     setImageFileUploading(null)
+    location.reload()
   }
 
   if (!session) return;
 
   return (
-    <div className="flex border-gray-200 p-3 space-x-3 w-full">
+    <div className="flex border-b border-gray-200 p-3 space-x-3 w-full">
       <img
         src={session.user.image}
         alt="user-image"

@@ -10,6 +10,13 @@ import {
   ref,
   uploadBytesResumable,
 } from 'firebase/storage'
+import {
+  addDoc,
+  collection,
+  getFirestore,
+  serverTimestamp
+} from 'firebase/firestore';
+
 
 export default function Input() {
   const { data: session } = useSession();
@@ -17,6 +24,9 @@ export default function Input() {
   const [imageFileUrl, setImageFileUrl] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [text, setText] = useState("");
+  const [postLoading, setPostLoading] = useState(false);
+  const db = getFirestore(app);
   const addImageToPost = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -59,6 +69,23 @@ export default function Input() {
     );
   };
 
+  const handlePostSubmit = async () => {
+    setPostLoading(true);
+    const docRef = await addDoc(collection(db, 'posts'),{
+      uid: session.user.uid,
+      name: session.user.name,
+      username: session.user.username,
+      text,
+      profileImg: session.user.image,
+      image: imageFileUrl,
+      timestamp: serverTimestamp(), 
+    })
+    setPostLoading(false);
+    setText("")
+    setImageFileUrl(null);
+    setImageFileUploading(null)
+  }
+
   if (!session) return;
 
   return (
@@ -73,12 +100,15 @@ export default function Input() {
           rows={2}
           placeholder="What's happening?"
           className="w-full border-none outline-none tracking-wide min-h-[50px] text-gray-700"
+          value={text}
+          onChange={(e) => {setText(e.target.value)}}
         ></textarea>
         {selectedFile && (
           <img
             src={imageFileUrl}
             alt="post image"
-            className="w-full max-h-[250px] object-cover cursor-pointer"
+            className={`w-full max-h-[250px] object-cover cursor-pointer"
+            ${imageFileUploading ? 'animate-pulse' : ''}`}
           />
         )}
         <div className="flex items-center justify-between pt-2.5">
@@ -93,7 +123,11 @@ export default function Input() {
             onChange={addImageToPost}
             className="hidden"
           />
-          <button className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50">
+          <button 
+          disabled = {text.trim() === "" || postLoading || imageFileUploading}
+          className="bg-blue-400 text-white px-4 py-1.5 rounded-full font-bold shadow-md hover:brightness-95 disabled:opacity-50"
+          onClick={handlePostSubmit}
+          >
             Post
           </button>
         </div>

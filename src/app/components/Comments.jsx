@@ -20,7 +20,7 @@ export default function Comments({id}) {
   return (
     <div>
       {comments.map((comment) => {
-        return <Comment key={comment.id} comment={comment.data()} id={comment.id} />;
+        return <Comment key={comment.id} comment={comment.data()} commentId={comment.id} originalPostId={id} />;
       })}
     </div>
   );

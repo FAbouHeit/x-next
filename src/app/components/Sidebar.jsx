@@ -15,7 +15,7 @@ export default function Sidebar() {
         <FaXTwitter className="w-16 h-16 cursor-pointer p-3 hover:bg-gray-100 rounded-full transition-all duration-200" />
       </Link>
       <Link
-        href=""
+        href="/"
         className="flex items-center p-3 hover:bg-gray-100 rounded-full transition-all duration-200 gap-2 w-fit"
         >
         <HiHome className="w-7 h-7" />

@@ -6,7 +6,7 @@ import { collection, deleteDoc, doc, getFirestore, onSnapshot, serverTimestamp, 
 import {app} from '../firebase'
 import { useEffect, useState } from "react";
 
-export default function Icons({id}) {
+export default function Icons({id, uid}) {
     const [isLiked, setIsLiked] = useState(false);
     const [likes, setLikes] = useState([])
 
@@ -40,6 +40,24 @@ export default function Icons({id}) {
         )
     },[likes])
 
+    const deletePost = async()=>{
+        if(window.confirm("Are You Sure You Want To Delete Post?")){
+            if(session?.user?.uid === uid){
+
+                deleteDoc(doc(db, "posts", id))
+                .then(()=>{
+                    console.log("Post deleted successfully");
+                    window.location.reload();
+                    
+                })
+                .catch((error)=>{
+                    console.log(error)
+                })
+            } else {
+                alert("You are not authorised to do this.")
+            }
+        }
+    }
 
   return (
     <div className="flex justify-start gap-5 p-2 text-gray-500">
@@ -59,7 +77,12 @@ export default function Icons({id}) {
     }
     {likes.length > 0 && <span className={`text-xs ${isLiked && "text-red-600"}`}>{likes.length}</span>}
     </div>
-        <HiOutlineTrash className="h-8 w-8 cursor-pointer rounded-full transition duration-500 ease-in-out p-2 hover:text-red-500 hover:bg-red-100" />
+
+    {session?.user?.uid === uid && 
+        <HiOutlineTrash 
+        onClick={deletePost}
+        className="h-8 w-8 cursor-pointer rounded-full transition duration-500 ease-in-out p-2 hover:text-red-500 hover:bg-red-100" />
+    }
         </div>
         );
 }
